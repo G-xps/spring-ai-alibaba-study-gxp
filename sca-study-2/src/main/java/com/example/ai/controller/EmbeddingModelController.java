@@ -1,7 +1,9 @@
 package com.example.ai.controller;
 
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,5 +87,36 @@ public class EmbeddingModelController {
     public String dimensions() {
         int dim = embeddingModel.dimensions();
         return "当前嵌入模型的向量维度为：" + dim;
+    }
+
+    /**
+     * 运行时覆盖嵌入参数（演示代码级别覆盖 yml 兜底配置）
+     * GET /ai/embedding/with-options?text=Hello&dimensions=512
+     */
+    @GetMapping("/with-options")
+    public String withOptions(
+            @RequestParam(defaultValue = "Spring AI Alibaba") String text,
+            @RequestParam(defaultValue = "512") int dimensions) {
+
+        EmbeddingResponse response = embeddingModel.call(
+                new EmbeddingRequest(List.of(text),
+                        DashScopeEmbeddingOptions.builder()
+                                .withModel("text-embedding-v3")
+                                .withTextType("query")
+                                .withDimensions(dimensions)
+                                .build()));
+
+        float[] output = response.getResult().getOutput();
+        List<Float> list = new ArrayList<>();
+        for (float v : output) {
+            list.add(v);
+        }
+
+        return """
+        原文：%s
+        覆盖参数：model=text-embedding-v3, textType=query, dimensions=%s
+        实际维度：%s
+        前 5 个值：%s
+        """.formatted(text, dimensions, output.length, list.subList(0, Math.min(5, list.size())));
     }
 }

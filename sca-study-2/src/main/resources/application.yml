@@ -6,3 +6,8 @@ spring:
         options:
           model: qwen-plus
           temperature: 0.7
+      embedding:
+        options:
+          model: text-embedding-v3
+          text-type: document
+          dimensions: 1024

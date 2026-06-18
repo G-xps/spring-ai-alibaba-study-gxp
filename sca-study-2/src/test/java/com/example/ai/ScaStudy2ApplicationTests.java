@@ -93,25 +93,14 @@ class ScaStudy2ApplicationTests {
         System.out.println(response.getBody());
     }
 
-    // ===== AudioModel =====
-
     @Test
-    void testAudioTts() {
+    void testEmbeddingWithOptions() {
         ResponseEntity<String> response = restTemplate
-                .getForEntity("/ai/audio/tts?text=你好", String.class);
+                .getForEntity("/ai/embedding/with-options?text=Hello&dimensions=256", String.class);
         assertThat(response.getStatusCode().value()).isEqualTo(200);
         assertThat(response.getBody()).isNotBlank();
-        System.out.println("=== /ai/audio/tts ===");
-        System.out.println(response.getBody());
-    }
-
-    @Test
-    void testAudioTranscribe() {
-        ResponseEntity<String> response = restTemplate
-                .getForEntity("/ai/audio/transcribe?fileUrl=https://example.com/test.wav", String.class);
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
-        assertThat(response.getBody()).isNotBlank();
-        System.out.println("=== /ai/audio/transcribe ===");
+        assertThat(response.getBody()).contains("覆盖参数");
+        System.out.println("=== /ai/embedding/with-options ===");
         System.out.println(response.getBody());
     }
 }

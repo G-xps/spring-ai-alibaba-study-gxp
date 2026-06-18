@@ -11,13 +11,33 @@
 | **ImageModel** | `/ai/image/generate` | 文生图，返回图片 URL |
 |  | `/ai/image/response` | 文生图，返回图片 URL + 描述信息 |
 | **EmbeddingModel** | `/ai/embedding/single` | 单条文本 → 向量，展示维度与全部值 |
-|  | `/ai/embedding/batch` | 批量文本 → 向量，含 Token 用量统计 |
+|  | `/ai/embedding/batch` | 批量文本 → 向量 |
 |  | `/ai/embedding/dimensions` | 查询当前模型的向量维度 |
+|  | `/ai/embedding/with-options` | 运行时覆盖嵌入参数（演示代码级覆盖 yml 兜底） |
+
+## 配置说明
+
+嵌入模型支持两层配置：
+
+1. **yml 兜底**（application.yml）
+```yaml
+spring:
+  ai:
+    dashscope:
+      embedding:
+        options:
+          model: text-embedding-v3
+          text-type: document
+          dimensions: 1024
+```
+
+2. **代码运行时覆盖** — 通过 `DashScopeEmbeddingOptions` 在调用时传参覆盖
+   - 示例：`GET /ai/embedding/with-options?text=Hello&dimensions=256`
 
 ## 模型
 
 - **文生图**：通义万相（`wanx-v1`），1024×1024
-- **嵌入**：通义千问 text-embedding-v3（由 starter 自动配置）
+- **嵌入**：通义千问 text-embedding-v3（yml 兜底，代码可覆盖）
 
 ## 运行
 
