@@ -20,6 +20,7 @@
 
     <modules>
         <module>sca-study-1</module>
+        <module>sca-study-2</module>
     </modules>
 
     <properties>
