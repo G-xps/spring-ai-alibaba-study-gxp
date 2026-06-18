@@ -37,7 +37,7 @@ public class ChatClientController {
                 .defaultSystem("你是一个知识渊博的助手，回答简洁准确。")
                 // 全局默认参数
                 .defaultOptions(DashScopeChatOptions.builder()
-                        .withTemperature(0.7f)
+                        .withTemperature(0.7)
                         .build())
                 .build();
         this.chatModel = chatModel;
@@ -65,13 +65,13 @@ public class ChatClientController {
 
         Generation result = chatResponse.getResult();
         return new ChatClientResponse(
-                result.getOutput().getContent(),
+                result.getOutput().getText(),
                 result.getOutput().getMessageType().name(),
                 result.getMetadata().getFinishReason(),
                 chatResponse.getMetadata().getUsage() != null
                         ? new TokenUsage(
                         chatResponse.getMetadata().getUsage().getPromptTokens(),
-                        chatResponse.getMetadata().getUsage().getGenerationTokens(),
+                        chatResponse.getMetadata().getUsage().getCompletionTokens(),
                         chatResponse.getMetadata().getUsage().getTotalTokens())
                         : null,
                 chatResponse.getMetadata().getId(),
@@ -89,7 +89,7 @@ public class ChatClientController {
     @GetMapping("/options")
     public String options(
             @RequestParam(defaultValue = "给我讲个笑话") String input,
-            @RequestParam(defaultValue = "0.9") float temp,
+            @RequestParam(defaultValue = "0.9") double temp,
             @RequestParam(defaultValue = "500") int maxTokens) {
         return chatClient.prompt()
                 .user(input)
@@ -113,10 +113,10 @@ public class ChatClientController {
             @RequestParam(defaultValue = "0.3") double temp) {
         Prompt prompt = new Prompt(input, DashScopeChatOptions.builder()
                 .withModel(model)
-                .withTemperature((float) temp)
+                .withTemperature(temp)
                 .build());
         ChatResponse response = chatModel.call(prompt);
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 
     // ================ 实体映射 ================
@@ -242,9 +242,9 @@ public class ChatClientController {
     /** Token 用量 */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record TokenUsage(
-            Long promptTokens,
-            Long completionTokens,
-            Long totalTokens
+            Integer promptTokens,
+            Integer completionTokens,
+            Integer totalTokens
     ) {}
 
     /** 实体映射用：演员电影作品 */
@@ -266,7 +266,7 @@ public class ChatClientController {
 
     /** 内容片段 → delta 事件 */
     private java.util.Optional<String> buildDeltaEvent(ChatResponse chunk) {
-        String content = chunk.getResult().getOutput().getContent();
+        String content = chunk.getResult().getOutput().getText();
         if (content == null || content.isEmpty()) {
             return java.util.Optional.empty();
         }
@@ -300,7 +300,7 @@ public class ChatClientController {
             return "";
         }
         return "\"usage\":{\"promptTokens\":%s,\"completionTokens\":%s,\"totalTokens\":%s}"
-                .formatted(usage.getPromptTokens(), usage.getGenerationTokens(), usage.getTotalTokens());
+                .formatted(usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens());
     }
 
     /** 从 chunk 中提取 id 和 model 元数据 JSON 片段（从 ChatResponseMetadata 获取） */

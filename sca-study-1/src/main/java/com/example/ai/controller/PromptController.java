@@ -47,7 +47,7 @@ public class PromptController {
         PromptTemplate promptTemplate = new PromptTemplate("给我讲一个{adjective}的关于{topic}的笑话");
         Prompt prompt = promptTemplate.create(Map.of("adjective", adjective, "topic", topic));
         ChatResponse response = chatModel.call(prompt);
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 
     /**
@@ -74,7 +74,7 @@ public class PromptController {
         // 组装 Prompt 并调用
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         ChatResponse response = chatModel.call(prompt);
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 
     /**
@@ -96,7 +96,7 @@ public class PromptController {
         Message userMessage = new UserMessage(input);
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         ChatResponse response = chatModel.call(prompt);
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 
     /**
@@ -115,9 +115,9 @@ public class PromptController {
                 输出：%s
                 总计：%s
                 """.formatted(
-                    response.getResult().getOutput().getContent(),
+                    response.getResult().getOutput().getText(),
                     response.getMetadata().getUsage() != null ? response.getMetadata().getUsage().getPromptTokens() : "未知",
-                    response.getMetadata().getUsage() != null ? response.getMetadata().getUsage().getGenerationTokens() : "未知",
+                    response.getMetadata().getUsage() != null ? response.getMetadata().getUsage().getCompletionTokens() : "未知",
                     response.getMetadata().getUsage() != null ? response.getMetadata().getUsage().getTotalTokens() : "未知"
                 );
     }

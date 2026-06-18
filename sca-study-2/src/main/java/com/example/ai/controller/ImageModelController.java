@@ -29,9 +29,9 @@ public class ImageModelController {
     public String generate(@RequestParam(defaultValue = "一只可爱的猫咪，卡通风格") String input) {
         ImageResponse response = imageModel.call(
                 new ImagePrompt(input, ImageOptionsBuilder.builder()
-                        .withModel("wanx-v1")
-                        .withHeight(1024)
-                        .withWidth(1024)
+                        .model("wanx-v1")
+                        .height(1024)
+                        .width(1024)
                         .build())
         );
         return response.getResult().getOutput().getUrl();
@@ -45,9 +45,9 @@ public class ImageModelController {
     public String response(@RequestParam(defaultValue = "中国山水画风格的高山流水") String input) {
         ImageResponse response = imageModel.call(
                 new ImagePrompt(input, ImageOptionsBuilder.builder()
-                        .withModel("wanx-v1")
-                        .withHeight(1024)
-                        .withWidth(1024)
+                        .model("wanx-v1")
+                        .height(1024)
+                        .width(1024)
                         .build())
         );
         ImageGeneration result = response.getResult();

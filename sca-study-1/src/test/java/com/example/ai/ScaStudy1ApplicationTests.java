@@ -25,7 +25,7 @@ class ScaStudy1ApplicationTests {
         public RestTemplateBuilder restTemplateBuilder() {
             return new RestTemplateBuilder()
                     .setConnectTimeout(Duration.ofSeconds(60))
-                    .setReadTimeout(Duration.ofSeconds(600));
+                    .setReadTimeout(Duration.ofSeconds(6000));
         }
     }
 
