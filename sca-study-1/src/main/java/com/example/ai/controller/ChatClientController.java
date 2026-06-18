@@ -1,9 +1,12 @@
 package com.example.ai.controller;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,15 +21,26 @@ import java.util.List;
  * 2. 流式事件流（SSE）— 带事件类型的结构化推送
  * 3. 实体映射 — 将内容转为 POJO
  * 4. System Prompt 角色设定
+ * 5. 模型参数控制 — options / defaultOptions
+ * 6. Generation 元数据 — id、model 等
  */
 @RestController
 @RequestMapping("/ai/chat-client")
 public class ChatClientController {
 
     private final ChatClient chatClient;
+    private final ChatModel chatModel;
 
-    public ChatClientController(ChatClient.Builder builder) {
-        this.chatClient = builder.build();
+    public ChatClientController(ChatClient.Builder builder, ChatModel chatModel) {
+        this.chatClient = builder
+                // 全局默认 System Prompt：没有手动传 system() 时自动使用
+                .defaultSystem("你是一个知识渊博的助手，回答简洁准确。")
+                // 全局默认参数
+                .defaultOptions(DashScopeChatOptions.builder()
+                        .withTemperature(0.7f)
+                        .build())
+                .build();
+        this.chatModel = chatModel;
     }
 
     // ================ 完整结构化响应 ================
@@ -34,9 +48,11 @@ public class ChatClientController {
     /**
      * 返回完整的 ChatResponse，包含：
      * - output.text       → 模型回复内容
+     * - output.role       → 角色
      * - metadata.usage    → Token 用量（输入/输出/总计）
      * - result.finishReason → 结束原因
-     * - result.role       → 角色
+     * - result.id         → 响应 ID
+     * - result.model      → 模型名称
      * <p>
      * GET /ai/chat-client/response?input=用一句话介绍微服务
      */
@@ -51,14 +67,56 @@ public class ChatClientController {
         return new ChatClientResponse(
                 result.getOutput().getContent(),
                 result.getOutput().getMessageType().name(),
-                result.getMetadata().getFinishReason(), // 模型结束原因，如 max_tokens、stop、length 等
+                result.getMetadata().getFinishReason(),
                 chatResponse.getMetadata().getUsage() != null
                         ? new TokenUsage(
                         chatResponse.getMetadata().getUsage().getPromptTokens(),
                         chatResponse.getMetadata().getUsage().getGenerationTokens(),
                         chatResponse.getMetadata().getUsage().getTotalTokens())
-                        : null
+                        : null,
+                chatResponse.getMetadata().getId(),
+                chatResponse.getMetadata().getModel()
         );
+    }
+
+    // ================ 模型参数控制 ================
+
+    /**
+     * 演示 ChatClient 的 .options() — 每次调用时覆盖模型参数
+     * <p>
+     * GET /ai/chat-client/options?input=给我讲个笑话&temp=0.9&maxTokens=500
+     */
+    @GetMapping("/options")
+    public String options(
+            @RequestParam(defaultValue = "给我讲个笑话") String input,
+            @RequestParam(defaultValue = "0.9") float temp,
+            @RequestParam(defaultValue = "500") int maxTokens) {
+        return chatClient.prompt()
+                .user(input)
+                .options(DashScopeChatOptions.builder()
+                        .withTemperature(temp)
+                        .build())
+                .call()
+                .content();
+    }
+
+    /**
+     * 演示 ChatModel 底层传参 — Prompt 携带 ChatOptions
+     * ChatClient 的 .options() 底层也是转成这个
+     * <p>
+     * GET /ai/chat-client/model-options?input=用一句话介绍 Spring&model=qwen-max&temp=0.3
+     */
+    @GetMapping("/model-options")
+    public String modelOptions(
+            @RequestParam(defaultValue = "用一句话介绍 Spring") String input,
+            @RequestParam(defaultValue = "qwen-max") String model,
+            @RequestParam(defaultValue = "0.3") double temp) {
+        Prompt prompt = new Prompt(input, DashScopeChatOptions.builder()
+                .withModel(model)
+                .withTemperature((float) temp)
+                .build());
+        ChatResponse response = chatModel.call(prompt);
+        return response.getResult().getOutput().getContent();
     }
 
     // ================ 实体映射 ================
@@ -176,7 +234,9 @@ public class ChatClientController {
             String content,
             String role,
             String finishReason,
-            TokenUsage usage
+            TokenUsage usage,
+            String id,
+            String model
     ) {}
 
     /** Token 用量 */
@@ -224,9 +284,12 @@ public class ChatClientController {
         }
 
         String usageJson = buildUsageJson(chunk);
-        String comma = usageJson.isEmpty() ? "" : ",";
+        String metaJson = buildMetadataJson(chunk);
+        // 合并用量和元数据，用逗号拼接
+        String combined = joinJsonFields(usageJson, metaJson);
+        String comma = combined.isEmpty() ? "" : ",";
         return java.util.Optional.of("event: finish\ndata: {\"finishReason\":\"%s\"%s%s}\n\n"
-                .formatted(finishReason, comma, usageJson));
+                .formatted(finishReason, comma, combined));
     }
 
     /** 从 chunk 中提取 Token 用量 JSON 片段 */
@@ -238,6 +301,36 @@ public class ChatClientController {
         }
         return "\"usage\":{\"promptTokens\":%s,\"completionTokens\":%s,\"totalTokens\":%s}"
                 .formatted(usage.getPromptTokens(), usage.getGenerationTokens(), usage.getTotalTokens());
+    }
+
+    /** 从 chunk 中提取 id 和 model 元数据 JSON 片段（从 ChatResponseMetadata 获取） */
+    private String buildMetadataJson(ChatResponse chunk) {
+        String id = chunk.getMetadata() != null ? chunk.getMetadata().getId() : null;
+        String model = chunk.getMetadata() != null ? chunk.getMetadata().getModel() : null;
+        if (id == null && model == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        if (id != null) {
+            sb.append("\"id\":\"").append(jsonEscape(id)).append("\"");
+        }
+        if (model != null) {
+            if (sb.length() > 0) sb.append(",");
+            sb.append("\"model\":\"").append(jsonEscape(model)).append("\"");
+        }
+        return sb.toString();
+    }
+
+    /** 拼接多个 JSON 字段片段（逗号分隔） */
+    private String joinJsonFields(String... fields) {
+        StringBuilder sb = new StringBuilder();
+        for (String f : fields) {
+            if (!f.isEmpty()) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(f);
+            }
+        }
+        return sb.toString();
     }
 
     /** 转义 JSON 字符串中的特殊字符 */

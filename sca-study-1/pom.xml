@@ -13,7 +13,7 @@
 
     <artifactId>sca-study-1</artifactId>
     <name>sca-study-1</name>
-    <description>第一阶段：基础入门 — Hello World</description>
+    <description>第一阶段：基础入门</description>
 
     <dependencies>
         <dependency>

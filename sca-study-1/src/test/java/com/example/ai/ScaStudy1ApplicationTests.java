@@ -58,6 +58,7 @@ class ScaStudy1ApplicationTests {
         assertThat(response.getBody()).isNotBlank();
         assertThat(response.getBody()).contains("content");
         assertThat(response.getBody()).contains("finishReason");
+        assertThat(response.getBody()).contains("model");
         System.out.println("=== /ai/chat-client/response ===");
         System.out.println(response.getBody());
     }
@@ -164,6 +165,38 @@ class ScaStudy1ApplicationTests {
         assertThat(response.getBody()).isNotBlank();
         assertThat(response.getBody()).contains("Token 用量");
         System.out.println("=== /ai/prompt/metadata ===");
+        System.out.println(response.getBody());
+    }
+
+    // ===== 新增补充功能 =====
+
+    @Test
+    void testOptions() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/ai/chat-client/options?input=给我讲个笑话&temp=0.9&maxTokens=500", String.class);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isNotBlank();
+        System.out.println("=== /ai/chat-client/options ===");
+        System.out.println(response.getBody());
+    }
+
+    @Test
+    void testModelOptions() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/ai/chat-client/model-options?input=用一句话介绍 Spring&model=qwen-plus&temp=0.3", String.class);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isNotBlank();
+        System.out.println("=== /ai/chat-client/model-options ===");
+        System.out.println(response.getBody());
+    }
+
+    @Test
+    void testPromptFile() {
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/ai/prompt/file?name=小智&topic=微服务&input=什么是服务发现", String.class);
+        assertThat(response.getStatusCode().value()).isEqualTo(200);
+        assertThat(response.getBody()).isNotBlank();
+        System.out.println("=== /ai/prompt/file ===");
         System.out.println(response.getBody());
     }
 }

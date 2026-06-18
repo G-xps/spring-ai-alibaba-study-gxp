@@ -7,6 +7,8 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +26,10 @@ import java.util.Map;
 public class PromptController {
 
     private final ChatModel chatModel;
+
+    /** 从 classpath 加载 System Prompt 模板文件 */
+    @Value("classpath:prompts/system-prompt.st")
+    private Resource systemPromptResource;
 
     public PromptController(ChatModel chatModel) {
         this.chatModel = chatModel;
@@ -66,6 +72,28 @@ public class PromptController {
         Message userMessage = new UserMessage(input);
 
         // 组装 Prompt 并调用
+        Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+        ChatResponse response = chatModel.call(prompt);
+        return response.getResult().getOutput().getContent();
+    }
+
+    /**
+     * 从文件加载 SystemPromptTemplate
+     * 模板文件：src/main/resources/prompts/system-prompt.st
+     * <p>
+     * GET /ai/prompt/file?name=小智&topic=微服务&input=什么是服务发现
+     */
+    @GetMapping("/file")
+    public String file(
+            @RequestParam(defaultValue = "小智") String name,
+            @RequestParam(defaultValue = "微服务") String topic,
+            @RequestParam(defaultValue = "什么是服务发现") String input) {
+
+        // 从 Resource 文件加载模板
+        SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemPromptResource);
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", name, "topic", topic));
+
+        Message userMessage = new UserMessage(input);
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
         ChatResponse response = chatModel.call(prompt);
         return response.getResult().getOutput().getContent();
