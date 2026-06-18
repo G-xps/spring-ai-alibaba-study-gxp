@@ -1,4 +1,4 @@
-package com.example.ai.function;
+package com.example.ai.tool;
 
 import com.example.ai.service.WeatherService;
 import org.springframework.ai.chat.model.ToolContext;

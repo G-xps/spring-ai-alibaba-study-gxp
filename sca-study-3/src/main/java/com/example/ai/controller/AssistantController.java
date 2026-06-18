@@ -1,7 +1,7 @@
 package com.example.ai.controller;
 
-import com.example.ai.function.CurrentDateTimeTool;
-import com.example.ai.function.WeatherTool;
+import com.example.ai.tool.CurrentDateTimeTool;
+import com.example.ai.tool.WeatherTool;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;

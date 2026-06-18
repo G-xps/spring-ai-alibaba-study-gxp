@@ -1,4 +1,4 @@
-package com.example.ai.function;
+package com.example.ai.tool;
 
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
