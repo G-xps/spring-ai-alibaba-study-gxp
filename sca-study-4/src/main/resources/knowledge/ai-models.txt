@@ -1,0 +1,18 @@
+Spring AI Alibaba 提供了多种 AI 模型的支持：
+
+通义千问（Qwen）系列：
+- qwen-plus：综合性能最强的模型，适合各种对话场景。
+- qwen-max：最大参数的模型，处理复杂任务时效果最好。
+- qwen-turbo：轻量快速模型，适合简单对话。
+- qwen2.5-vl-72b：多模态视觉模型，支持图片理解。
+
+通义万相（Wanx）系列：
+- wanx-v1：文生图模型，可以根据文本描述生成图片。
+
+文本嵌入模型：
+- text-embedding-v2：第二代文本嵌入模型，支持 1024 维。
+- text-embedding-v3：第三代文本嵌入模型，支持自定义维度。
+- text-embedding-v4：最新的文本嵌入模型，支持最高 2048 维。
+
+嵌入模型支持自定义输出维度：text-embedding-v3 支持 64、128、256、512、768、1024 维。
+嵌入模型的 text-type 参数用于区分输入文本场景，query 表示查询，document 表示文档。

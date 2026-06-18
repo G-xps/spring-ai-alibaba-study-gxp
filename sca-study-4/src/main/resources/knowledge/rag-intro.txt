@@ -1,0 +1,20 @@
+RAG（检索增强生成）是 Spring AI Alibaba 的核心功能之一。
+
+RAG 的完整流程包括 ETL 管道和检索生成两部分。
+
+ETL 管道步骤：
+1. 读取：通过 DocumentReader 读取各种格式的文档，包括 TXT、PDF、Word 等。
+2. 分割：通过 DocumentSplitter 将长文档按语义边界拆分成合适大小的片段。
+3. 嵌入：通过 EmbeddingModel 将文本片段转换为向量表示。
+4. 存储：将向量存入 VectorStore 中，用于后续检索。
+
+检索生成步骤：
+1. 用户提出问题。
+2. 将问题通过 EmbeddingModel 转换为向量。
+3. 在 VectorStore 中进行相似性搜索，找到最相关的文档片段。
+4. 将检索到的文档片段和原始问题组装成 Prompt。
+5. 发送给 ChatModel 生成最终回答。
+
+QuestionAnswerAdvisor 是 Spring AI 内置的 RAG Advisor，可以自动完成检索和组装流程。
+MessageChatMemoryAdvisor 可以维护多轮对话历史。
+多个 Advisor 可以组合使用，实现记忆 + RAG 的完整效果。
