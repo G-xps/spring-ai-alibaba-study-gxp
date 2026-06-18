@@ -1,6 +1,7 @@
 # spring-ai-alibaba-study-gxp
 
-> 记录本人学习 **Spring AI Alibaba** 的学习历程，包括测试用例
+> 记录本人学习 **Spring Cloud AI Alibaba** 的学习历程，包括测试用例
+> **注意**：这个仓库是基础试验，更多高级应用在 [spring-ai-alibaba-projects-gxp](https://github.com/G-xps/spring-ai-alibaba-projects-gxp.git)
 
 ## 目录结构
 
@@ -16,6 +17,7 @@
 ```
 
 各模块详情见下对应 `README.md`。
+
 
 > 学习计划已制定，详见 [doc/learning-plan.md](doc/learning-plan.md)，代码逐步搭建中
 
