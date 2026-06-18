@@ -22,6 +22,8 @@
         <module>sca-study-1</module>
         <module>sca-study-2</module>
         <module>sca-study-3</module>
+        <module>sca-study-4</module>
+        <module>sca-study-5</module>
     </modules>
 
     <properties>

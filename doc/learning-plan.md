@@ -35,9 +35,7 @@
   └── 综合项目：智能问答助手
 
 第六阶段：AI Agent 与生产化
-  ├── 多工具协同 Agent
-  ├── 生产化最佳实践
-  └── 综合项目：智能机票助手
+  └── 多工具协同 Agent
 ```
 ---
 ## 第一阶段：基础入门
@@ -46,13 +44,13 @@
 
 **目标：** 搭好开发环境，跑通第一个 AI 对话应用。
 
-| 项目 | 说明 |
-|---|---|
-| JDK | 要求 17+ |
-| 框架 | Spring Boot 3.x + Spring AI Alibaba |
-| 当前版本 | `1.0.0-M2.1` |
-| API-KEY | 阿里云百炼平台获取 |
-| Maven 仓库 | 需添加 Spring Milestones 仓库 |
+| 项目 | 说明                                  |
+|---|-------------------------------------|
+| JDK | 要求 17+                              |
+| 框架 | Spring Boot 3.3 + Spring AI Alibaba |
+| 当前版本 | `1.0.0-M6.1`                        |
+| API-KEY | 阿里云百炼平台获取                           |
+| Maven 仓库 | 需添加 Spring Milestones 仓库            |
 
 **关键依赖：**
 
@@ -60,7 +58,7 @@
 <dependency>
     <groupId>com.alibaba.cloud.ai</groupId>
     <artifactId>spring-ai-alibaba-starter</artifactId>
-    <version>1.0.0-M2.1</version>
+    <version>1.0.0-M6.1</version>
 </dependency>
 ```
 
@@ -344,49 +342,28 @@
 2. 实现 Token 用量日志
 3. 简单的缓存策略
 
-### 6.3 综合项目：智能机票助手
-
-参照官方的"智能机票助手"实践项目，综合运用以下技术：
-- ChatClient + ChatModel
-- Function Calling（查航班、查价格、下单）
-- Chat Memory（多轮对话上下文）
-- Structured Output（结构化展示结果）
 
 ---
 
 ## 学习进度跟踪
 
-| 阶段 | 模块 | 预计时间 | 状态 |
-|---|---|---|---|
-| 一 | 环境搭建与快速开始 | 1 天 |  |
-| 一 | 核心概念理解 | 1 天 |  |
-| 二 | ChatClient | 2 天 |  |
-| 二 | ChatModel | 1 天 |  |
-| 二 | Prompt 与 Prompt Template | 1 天 |  |
-| 二 | Structured Output | 1 天 |  |
-| 三 | ImageModel | 1 天 |  |
-| 三 | AudioModel | 1 天 |  |
-| 三 | EmbeddingModel | 1 天 |  |
-| 四 | Function Calling | 2 天 |  |
-| 四 | Chat Memory | 1 天 |  |
-| 四 | Vector Store | 1 天 |  |
-| 五 | RAG 完整流程 | 2 天 |  |
-| 五 | Advisors | 1 天 |  |
-| 六 | AI Agent 实战 | 2 天 |  |
-| 六 | 综合项目 | 3 天 |  |
+| 阶段 | 模块 |
+|---|---|
+| 一 | 环境搭建与快速开始
+| 一 | 核心概念理解
+| 二 | ChatClient
+| 二 | ChatModel
+| 二 | Prompt 与 Prompt Template
+| 二 | Structured Output
+| 三 | ImageModel
+| 三 | AudioModel
+| 三 | EmbeddingModel
+| 四 | Function Calling
+| 四 | Chat Memory
+| 四 | Vector Store
+| 五 | RAG 完整流程
+| 五 | Advisors
+| 六 | AI Agent 实战
+| 六 | 综合项目 |
 
 ---
-
-## 参考文档
-
-- [Spring AI Alibaba 概述](https://sca.aliyun.com/en/docs/ai/overview/)
-- [核心概念](https://sca.aliyun.com/en/docs/ai/concepts/)
-- [快速开始](https://sca.aliyun.com/en/docs/ai/get-started/)
-- [ChatClient](https://sca.aliyun.com/en/docs/ai/tutorials/chat-client/)
-- [对话模型](https://sca.aliyun.com/en/docs/ai/tutorials/chat-model/)
-- [嵌入模型](https://sca.aliyun.com/en/docs/ai/tutorials/embedding/)
-- [函数调用](https://sca.aliyun.com/en/docs/ai/tutorials/function-calling/)
-- [对话记忆](https://sca.aliyun.com/en/docs/ai/tutorials/memory/)
-- [提示词](https://sca.aliyun.com/en/docs/ai/tutorials/prompt/)
-- [向量存储](https://sca.aliyun.com/en/docs/ai/tutorials/vectorstore/)
-- [结构化输出](https://sca.aliyun.com/en/docs/ai/tutorials/structured-output/)
