@@ -1,0 +1,8 @@
+spring:
+  ai:
+    dashscope:
+      api-key: ${QWEN_API_KEY}
+      chat:
+        options:
+          model: qwen-plus
+          temperature: 0.7
